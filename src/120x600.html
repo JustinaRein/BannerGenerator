@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta name="version" content="2.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="css/120x600.css" rel="stylesheet" type="text/css">
+<!-- Double Click Studio Enabler -->
+<script src="https://s0.2mdn.net/ads/studio/Enabler.js"></script>
+<!-- CDN Createjs-->
+<script type="text/javascript" src="https://code.createjs.com/easeljs-0.8.1.min.js"></script>
+<script type="text/javascript" src="https://code.createjs.com/tweenjs-0.6.1.min.js"></script>
+<script type="text/javascript" src="https://code.createjs.com/preloadjs-0.6.1.min.js"></script>
+<!-- TweenLite -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenLite.min.js"></script>
+<!-- TweenLite - This animation library is used to animate HTML elements using their CSS attributes. -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/latest/plugins/CSSPlugin.min.js"></script>
+<!-- Manifest generator -->
+<script type="text/javascript" src="js/ManifestGenerator.js"></script>
+<!-- HTML to canvas -->
+<script type="text/javascript" src="js/html2canvas.js"></script>
+<!--  Custom functions for the banner -->
+<script type="text/javascript" src="js/120x600-functions.js"></script>
+<script type="text/javascript" src="js/all-sizes-functions-spritesheet.js"></script>
+<!--  Legals scroll helper -->
+<script type="text/javascript" src="js/scrollbar-helper.js"></script>
+<!-- Creative application -->
+<script type="text/javascript" src="js/120x600-app.js"></script>
+<title>DCO</title>
+</head>
+<body>
+	<div id="ad" class="ad">
+        <div id="legal-button" class="legal-button">
+            <p id="legal-button-label" class="legal-button-label"></p>
+        </div>
+        <div id="advert-border" class="advert-border" onClick="exitHandler()"></div>
+        <div id="legal-copy-container" class="legal-copy-container">
+            <p id="legal-copy" class="legal-copy"></p>
+        </div>
+    	<canvas id="canvas" class="canvas" width="118" height="598"></canvas>
+	</div>
+</body>
+</html>
