@@ -205,60 +205,83 @@ function determineUseOfBackupImage() {
 	}
 }
 
+function createBannerLegals() {
+	var legalContainer = document.getElementById('legal-copy-container');
+	legalContainer.style.visibility = 'visible';
+	legalContainer.addEventListener('click',legalExitButtonHandler,false);
+
+	var copy = document.getElementById('legal-copy');
+	copy.innerHTML = data.Legal_copy;
+	TweenLite.to(copy, 0, {alpha:0});
+	TweenLite.to(copy, 1, {alpha:1});
+
+	var label = document.getElementById('legal-button-label');
+	TweenLite.to(label, 0, {alpha:0});
+	TweenLite.to(label, 1, {alpha:1});
+	label.innerHTML = data.Legal_button_label_standard_size;
+
+	var legalButton = document.getElementById('legal-button');
+	legalButton.style.left = (content.hasOwnProperty("legal-label-position") ? content['legal-label-position'].left : 5) + "px";
+	legalButton.style.top = (content.hasOwnProperty("legal-label-position") ? content['legal-label-position'].top : 77) + "px";
+	legalButton.addEventListener('click',legalButtonClickHandler,false);
+
+	if ( copy.clientHeight < 88 ) {
+		legalContainer.style.backgroundPositionX = "710px";
+		legalContainer.style.overflowY = "hidden";
+	}
+}
+
+function legalButtonClickHandler(e) {
+	document.getElementById('legal-button').style.zIndex = 2;
+	var offset = 88 - document.getElementById('legal-copy-container').clientHeight;
+	TweenLite.to(document.getElementById('legal-copy-container'), 0.5, {top:offset,onComplete:legalCopyContainerTweenInCompleteHandler});
+}
+
+function legalCopyContainerTweenInCompleteHandler() {
+	document.getElementById('legal-copy-container').style.zIndex = 5;
+	evaluateUseOfKeyDownListener();
+}
+
+function legalCopyContainerTweenOutCompleteHandler() {
+	document.getElementById('legal-button').style.zIndex = 5;
+}
+
+function legalExitButtonHandler() {
+	document.getElementById('legal-copy-container').style.zIndex = 3;
+	TweenLite.to(document.getElementById('legal-copy-container'), 0.5, {top:90,onComplete:legalCopyContainerTweenOutCompleteHandler});
+	removeKeyDownListener();
+}
+
+function createSkyLogo() {
+	var skyLogo = new createjs.Bitmap(queue.getResult("logo"));
+	skyLogo.name = "skyLogo";
+	skyLogo.regX = Math.floor(skyLogo.image.width * 0.5);
+	skyLogo.regY = Math.floor(skyLogo.image.height * 0.5);
+	skyLogo.x = 667;
+	skyLogo.y = 45;
+	skyLogo.alpha = 0;
+	brandContent.addChild(skyLogo);
+	createjs.Tween.get(skyLogo).to({alpha:1},500);
+}
+
+function removeSkyLogo() {
+	if ( brandContent.contains(brandContent.getChildByName("skyLogo")) ) {
+		brandContent.removeChild(brandContent.getChildByName("skyLogo"));
+	}
+}
+
+function placeSkyLogo() {
+	if ( !brandContent.contains(brandContent.getChildByName("skyLogo")) ) {
+		createSkyLogo();
+	}
+}
+
 function determineWhichFrameShouldBeDrawn() {
 	currentFrame = content.frames[++frameIndex];
 
 	if ( currentFrame !== null ) {
 		var frameType = currentFrame.type;
 		switch ( frameType ) {
-			case "INTRO-FRAME" :
-				createIntroductionFrame();
-				break;
-
-			case "TEXT-INTRO-FRAME" :
-				createTextIntroductionFrame();
-				break;
-			
-			case "TEXT-OFFER-FRAME-TYPE-1" :
-				createOfferFrameTypeOne();
-				break;
-			
-			case "TEXT-OFFER-FRAME-TYPE-2" :
-				createOfferFrameTypeTwo();
-				break;
-
-			case "TEXT-OFFER-FRAME-TYPE-3" :
-				createOfferFrameTypeThree();
-				break;				
-			
-			case "TEXT-CONTENT-FRAME" :
-				createContentFrame();
-				break;
-			
-			case "TEXT-PRICE-FRAME" :
-				createPriceFrame();
-				break;
-			
-			case "TEXT-ROUNDEL-FRAME" :
-				createRoundelFrame();
-				break;
-			
-			case "TEXT-ROUNDEL-END-FRAME" :
-				createRoundelEndFrame();
-				break;
-			
-			case "TEXT-END-FRAME" :
-				createEndFrame();
-				break;
-			
-			case "CUSTOM-END-FRAME" :
-				createCustomEndFrame();
-				break;
-			
-			case "SPRITESHEET-CONTENT-FRAME" :
-				createSpritesheetContentFrame();
-				break;
-				
 			case "MULTIPURPOSE-CONTENT-FRAME" :
 				createSpritesheetContentFrame();
 				break;
@@ -281,271 +304,6 @@ function createBannerContainers() {
 	brandContent = new createjs.Container();
 	brandContent.setBounds(0, 0, stage.canvas.width, stage.canvas.height);
 	stage.addChild(brandContent);
-}
-
-function animateIn(object, inAnimation, outAnimation, delayBetweenAnimations) {
-	switch (inAnimation.type) {
-		case "fade" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			object.y = 44;
-			object.x = 364;
-			object.alpha = 0;
-			stageContent.addChild(object);
-			if ( delayBetweenAnimations !== null ) {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-					animateOut(object, outAnimation);
-				});
-			} else {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut);
-			}
-			break;
-
-		case "slide" :
-			if ( inAnimation.hasOwnProperty("origin") ) {
-				var finalOffset = 0;
-				if ( inAnimation.origin === "right" ) {
-					object.regX = Math.floor(object.image.width * 0.5);
-					object.regY = Math.floor(object.image.height * 0.5);
-					object.y = 44;
-					object.x = 500;
-					object.alpha = 0;
-					stageContent.addChild(object);
-					createjs.Tween.get(object).to({x:364,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-						animateOut(object, outAnimation);
-					});
-				} else if ( inAnimation.origin === "left" ) {
-					object.regX = Math.floor(object.image.width * 0.5);
-					object.regY = Math.floor(object.image.height * 0.5);
-					object.y = 44;
-					object.x = 228;
-					object.alpha = 0;
-					stageContent.addChild(object);
-					createjs.Tween.get(object).to({x:364,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-						animateOut(object, outAnimation);
-					});
-				} else if ( inAnimation.origin === "top" ) {
-					object.regX = Math.floor(object.image.width * 0.5);
-					object.regY = Math.floor(object.image.height * 0.5);
-					object.x = 364;
-					object.y = 0 - Math.floor(object.image.height * 0.5);
-					object.alpha = 0;
-					finalOffset = 44;
-					stageContent.addChild(object);
-					createjs.Tween.get(object).to({y:finalOffset,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-						animateOut(object, outAnimation);
-					});
-				} else if ( inAnimation.origin === "bottom" ) {
-					object.regX = Math.floor(object.image.width * 0.5);
-					object.regY = Math.floor(object.image.height * 0.5);
-					object.x = 364;
-					object.y = 90 + Math.floor(object.image.height * 0.5);
-					object.alpha = 0;
-					finalOffset = 44;
-					stageContent.addChild(object);
-					createjs.Tween.get(object).to({y:finalOffset,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-						animateOut(object, outAnimation);
-					});
-				} else {
-					throw "ERROR: You have provided an origin which does not match any of the animation settings. Please check that you have spelt the attribute correctly: 'origin'. And that the value is set to 'top', 'right', 'bottom', or 'left'.";
-				}
-			} else {
-				throw "ERROR: Please check that you have defined the object attribute: origin. This is a slide animation setting.";
-			}
-
-
-			break;
-
-		case "scale" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			object.x = 364;
-			object.y = 44;
-			object.scaleX = 2;
-			object.scaleY = 2;
-			object.alpha = 0;
-			stageContent.addChild(object);
-			createjs.Tween.get(object).to({scaleX:1,scaleY:1,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-				animateOut(object, outAnimation);
-			});
-			break;
-
-		case "flip" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			object.x = 364;
-			object.y = 44;
-			object.alpha = 0;
-			object.scaleX = 0;
-			stageContent.addChild(object);
-			createjs.Tween.get(object).to({scaleX:1,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function(){
-				animateOut(object, outAnimation);
-			});
-			break;
-
-		case "cut" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			object.y = 44;
-			object.x = 364;
-			object.alpha = 1;
-			stageContent.addChild(object);
-			if ( delayBetweenAnimations !== null ) {
-				createjs.Tween.get(object).wait(parseInt(delayBetweenAnimations)).call(function() {
-					animateOut(object, outAnimation);
-				});
-			} else {
-				createjs.Tween.get(object).to({alpha:1},0,createjs.Ease.sineOut);
-			}
-			break;			
-	}
-}
-
-function animateOut(object, outAnimation) {
-	if ( outAnimation === null ) return;
-	switch (outAnimation.type) {
-		case "fade" :
-			createjs.Tween.get(object).to({alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		case "slide" :
-			if ( outAnimation.hasOwnProperty("destination") ) {
-				var finalOffset = 0;
-				if ( outAnimation.destination === "left" ) {
-					createjs.Tween.get(object).to({x:228,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-						stageContent.removeChild(object);
-					});
-				} else if ( outAnimation.destination === "right" ) {
-					createjs.Tween.get(object).to({x:500,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-						stageContent.removeChild(object);
-					});
-				} else if ( outAnimation.destination === "bottom" ) {
-					finalOffset = 90 + Math.floor(object.image.height * 0.5);
-					createjs.Tween.get(object).to({y:finalOffset,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-						stageContent.removeChild(object);
-					});
-				} else if ( outAnimation.destination === "top" ) {
-					finalOffset = 0 - Math.floor(object.image.height * 0.5);
-					createjs.Tween.get(object).to({y:finalOffset,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-						stageContent.removeChild(object);
-					});
-				} else {
-					throw "ERROR: You have provided a destination which does not match any of the animation settings. Please check that you have spelt the attribute correctly: 'destination'. And that the value is set to 'top', 'right', 'bottom', or 'left'.";
-				}
-			} else {
-				throw "ERROR: Please check that you have defined the object attribute: destination. This is a slide animation setting.";
-			}
-			break;
-		case "scale" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			createjs.Tween.get(object).to({scaleX:2,scaleY:2,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		case "flip" :
-			createjs.Tween.get(object).to({scaleX:0,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-
-		case "cut" :
-			console.log("works");
-			break;
-	}
-}
-
-function animateStraplineIn(object, inAnimation, outAnimation, delayBetweenAnimations) {
-	switch (inAnimation.type) {
-		case "fade" :
-			object.alpha = 0;
-			stageContent.addChild(object);
-			if ( outAnimation !== null ) {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-					animateStraplineOut(object, outAnimation);
-				});
-			} else {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut);
-			}
-			break;
-		default :
-			throw "ERROR: The type of animation you have selected is not available. You can only use: 'fade'.";
-	}
-}
-
-function animateStraplineOut(object, outAnimation) {
-	switch (outAnimation.type) {
-		case "fade" :
-			createjs.Tween.get(object).to({alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		default :
-			throw "ERROR: The type of animation you have selected is not available. You can only use: 'fade'.";
-	}
-}
-
-function animateRoundelIn(object, inAnimation, outAnimation, delayBetweenAnimations) {
-	switch (inAnimation.type) {
-		case "fade" :
-			object.alpha = 0;
-			stageContent.addChild(object);
-			if ( delayBetweenAnimations !== null ) {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-					animateOut(object, outAnimation);
-				});
-			} else {
-				createjs.Tween.get(object).to({alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut);
-			}
-			break;
-		case "scale" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			object.x = 364;
-			object.scaleX = 2;
-			object.scaleY = 2;
-			object.alpha = 0;
-			stageContent.addChild(object);
-			createjs.Tween.get(object).to({scaleX:1,scaleY:1,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function() {
-				animateOut(object, outAnimation);
-			});
-			break;
-		case "flip" :
-			object.alpha = 0;
-			object.scaleX = 0;
-			stageContent.addChild(object);
-			createjs.Tween.get(object).to({scaleX:1,alpha:1},parseInt(inAnimation.duration),createjs.Ease.sineOut).wait(parseInt(delayBetweenAnimations)).call(function(){
-				animateOut(object, outAnimation);
-			});
-			break;
-		default :
-			throw "ERROR: The type of animation you have selected is not available. You may only use: 'fade', 'scale', or 'flip'.";
-	}
-}
-
-function animateRoundelOut(object, outAnimation) {
-	switch (outAnimation.type) {
-		case "fade" :
-			createjs.Tween.get(object).to({alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		case "scale" :
-			object.regX = Math.floor(object.image.width * 0.5);
-			object.regY = Math.floor(object.image.height * 0.5);
-			createjs.Tween.get(object).to({scaleX:2,scaleY:2,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		case "flip" :
-			createjs.Tween.get(object).to({scaleX:0,alpha:0},parseInt(outAnimation.duration),createjs.Ease.sineOut).call(function() {
-				stageContent.removeChild(object);
-			});
-			break;
-		default :
-			throw "ERROR: The type of animation you have selected is not available. You may only use: 'fade', 'scale', or 'flip'.";
-	}
 }
 
 function removePreloader() {

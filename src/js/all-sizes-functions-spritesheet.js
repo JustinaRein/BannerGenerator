@@ -347,6 +347,17 @@ function createSpritesheetContentFrame() {
 	},delayUntilNextFrame);
 }
 
+function evaluateLoopingOfBanner() {
+	if ( loop > 0 ) {
+		--loop;
+		frameIndex = -1;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
 
 // --------------------
 function createSpritesheetGradientText( object, objectGradient ) {
